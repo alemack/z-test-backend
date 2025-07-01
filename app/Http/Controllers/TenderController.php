@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TenderFilterRequest;
+use App\Http\Requests\StoreTenderRequest;
 use App\Models\Tender;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TenderController extends Controller
 {
-    public function index(Request $request)
+    public function index(TenderFilterRequest $request): JsonResponse
     {
         $query = Tender::query();
 
-        // Фильтрация по названию (name)
         if ($request->filled('name')) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
-        // Фильтрация по дате (updated_at)
         if ($request->filled('date')) {
             $query->whereDate('updated_at', $request->date);
         }
@@ -23,29 +24,15 @@ class TenderController extends Controller
         return response()->json($query->get());
     }
 
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $tender = Tender::find($id);
-
-        if (!$tender) {
-            return response()->json(['message' => 'Tender not found'], 404);
-        }
-
+        $tender = Tender::findOrFail($id);
         return response()->json($tender);
     }
 
-    public function store(Request $request)
+    public function store(StoreTenderRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'external_code' => 'required|integer',
-            'number' => 'required|string',
-            'status' => 'required|string',
-            'name' => 'required|string',
-            'updated_at' => 'required|date',
-        ]);
-
-        $tender = Tender::create($data);
-
+        $tender = Tender::create($request->validated());
         return response()->json($tender, 201);
     }
 }
