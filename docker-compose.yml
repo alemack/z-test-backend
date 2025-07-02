@@ -28,6 +28,7 @@ services:
             MYSQL_USER: zebra_user
             MYSQL_PASSWORD: zebra_pass
             MYSQL_ROOT_PASSWORD: rootpass
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
         ports:
             - 3307:3306
         volumes:
